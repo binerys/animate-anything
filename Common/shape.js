@@ -131,7 +131,7 @@ function shape()
 				gl.uniformMatrix4fv( g_addrs.projection_camera_model_transform_loc, false, flatten( projection_camera_model_transform ) );
 				gl.uniformMatrix3fv( g_addrs.camera_model_transform_normal_loc, 	false, flatten( camera_model_transform_normal ) );
 				   
-				var N_LIGHTS = 2, lightPositions = [], lightColors = [], attenuations = [], 
+				var N_LIGHTS = 1, lightPositions = [], lightColors = [], attenuations = [], 
                 lightPositions_flattened = [], lightColors_flattened = [];
 				lightPositions.push( vec4( 10 * Math.sin(graphicsState.animation_time/1000), 2, -2, 1 ) );    
 				lightColors.push( vec4( 0, 1, 0, 1 ) );   

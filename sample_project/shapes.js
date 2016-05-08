@@ -331,7 +331,7 @@ function axis()
 				self.drawOneAxis(object_transform);				
 			} )(this);
 			
-																													// Only draw this set of axes if it is the one selected through the user interface.
+		// Only draw this set of axes if it is the one selected through the user interface.
 		this.draw = function( current, graphicsState, model_transform, material ) 	{ 	
 			if( this.basis_selection == current ) shape.prototype.draw.call(this, graphicsState, model_transform, material );	}	
 			
@@ -388,3 +388,76 @@ function text_line( string_size )		// Draws a rectangle textured with images of 
 
 	}
 inherit(text_line, shape);
+
+// Pentahedron (Strawberry Base)
+function pentahedron() {
+	shape.call(this); 
+	this.populate();
+	this.flat_normals_from_triples(0);
+	this.init_buffers();
+}
+
+inherit(pentahedron, shape);
+
+pentahedron.prototype.populate = function() {
+
+	// Faces 
+	this.vertices.push( vec3(0,0,0), vec3(-.5,1,.5), vec3(.5,1,.5) ); // Front
+	this.vertices.push( vec3(0,0,0), vec3(-.5,1,.5), vec3(-.5,1,-.5) ); // Left
+	this.vertices.push( vec3(0,0,0), vec3(.5,1,-.5), vec3(.5,1,.5) ); // Right
+	this.vertices.push( vec3(0,0,0), vec3(-.5,1,-.5), vec3(.5,1,-.5) ); // Back
+
+	// Top
+	this.vertices.push( vec3(-.5,1,.5), vec3(-.5,1,-.5), vec3(.5,1,.5) ); 
+	this.vertices.push( vec3(-.5,1,-.5), vec3(.5,1,-.5), vec3(.5,1,.5) );
+
+	// Each face in method 2 also gets its own set of texture coords (half the image is mapped onto each face). Couldn't do 
+	// this with shared vertices since it involves different results when approaching the same point from different directions.
+	this.texture_coords.push( vec3(0,0,0), vec3(-.5,1,.5), vec3(.5,1,.5) ); // Front
+	this.texture_coords.push( vec3(0,0,0), vec3(-.5,1,.5), vec3(-.5,1,-.5) ); // Left
+	this.texture_coords.push( vec3(0,0,0), vec3(.5,1,-.5), vec3(.5,1,.5) ); // Right
+	this.texture_coords.push( vec3(0,0,0), vec3(-.5,1,-.5), vec3(.5,1,-.5) ); // Back
+
+	// Top
+	this.texture_coords.push( vec3(-.5,1,.5), vec3(-.5,1,-.5), vec3(.5,1,.5) ); 
+	this.texture_coords.push( vec3(-.5,1,-.5), vec3(.5,1,-.5), vec3(.5,1,.5) );
+
+	this.indices.push( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17); // Unique vertices
+};
+
+// Flat pentahedron (Strawberry leaf)
+function flat_pentahedron() {
+	shape.call(this); 
+	this.populate();
+	this.flat_normals_from_triples(0);
+	this.init_buffers();
+}
+
+inherit(flat_pentahedron, shape);
+
+flat_pentahedron.prototype.populate = function() {
+
+	// Faces 
+	this.vertices.push( vec3(0,1.3,1), vec3(-.25,1,.25), vec3(.25,1,.25) ); // Front
+	this.vertices.push( vec3(-1,1.3,0), vec3(-.25,1,.25), vec3(-.25,1,-.25) ); // Left
+	this.vertices.push( vec3(1,1.3,0), vec3(.25,1,-.25), vec3(.25,1,.25) ); // Right
+	this.vertices.push( vec3(0,1.3,-1), vec3(-.25,1,-.25), vec3(.25,1,-.25) ); // Back
+
+	// Top
+	this.vertices.push( vec3(-.25,1,.25), vec3(-.25,1,-.25), vec3(.25,1,.25) ); 
+	this.vertices.push( vec3(-.25,1,-.25), vec3(.25,1,-.25), vec3(.25,1,.25) );
+
+	// Each face in method 2 also gets its own set of texture coords (half the image is mapped onto each face). Couldn't do 
+	// this with shared vertices since it involves different results when approaching the same point from different directions.
+	this.texture_coords.push( vec3(0,0,0), vec3(-.5,1,.5), vec3(.5,1,.5) ); // Front
+	this.texture_coords.push( vec3(0,0,0), vec3(-.5,1,.5), vec3(-.5,1,-.5) ); // Left
+	this.texture_coords.push( vec3(0,0,0), vec3(.5,1,-.5), vec3(.5,1,.5) ); // Right
+	this.texture_coords.push( vec3(0,0,0), vec3(-.5,1,-.5), vec3(.5,1,-.5) ); // Back
+
+	// Top
+	this.texture_coords.push( vec3(-.5,1,.5), vec3(-.5,1,-.5), vec3(.5,1,.5) ); 
+	this.texture_coords.push( vec3(-.5,1,-.5), vec3(.5,1,-.5), vec3(.5,1,.5) );
+
+	this.indices.push( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17); // Unique vertices
+};
+
