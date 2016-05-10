@@ -389,6 +389,52 @@ function text_line( string_size )		// Draws a rectangle textured with images of 
 	}
 inherit(text_line, shape);
 
+function cup()
+{
+	shape.call(this);
+	this.populate = (function (self)
+	{
+		var stack = [];
+		self.m_ball = new sphere(); self.m_fan = new cylindrical_strip(); self.m_cube = new cube();
+		var object_transform = mat4();
+		stack.push(object_transform);
+			object_transform = mult(object_transform, scale(0.30,0.2,0.30));
+			self.m_ball.populate( self, object_transform, 4);
+		object_transform = stack.pop();
+		stack.push(object_transform);
+		
+		object_transform = mult(object_transform, translation(0,.15,0));
+		object_transform = mult(object_transform, rotation(90,1,0,0));
+		object_transform = mult(object_transform, scale(0.313,0.313,0.313));
+			self.m_fan.populate(self, 10, object_transform);
+		object_transform = stack.pop();
+
+		stack.push(object_transform);
+		object_transform = mult(object_transform, translation(.4,0,0));
+		object_transform = mult(object_transform, scale(.2,0.05,0.05));
+			self.m_cube.populate(self, object_transform);
+		object_transform = stack.pop();
+
+		stack.push(object_transform);
+		object_transform = mult(object_transform, translation(.525,.1,0));
+		object_transform = mult(object_transform, rotation(90,0,0,1));
+		object_transform = mult(object_transform, scale(.25,0.05,0.05));
+			self.m_cube.populate(self, object_transform);
+		object_transform = stack.pop();
+
+		stack.push(object_transform);
+		object_transform = mult(object_transform, translation(.4,.2,0));
+		object_transform = mult(object_transform, scale(.2,0.05,0.05));
+			self.m_cube.populate(self, object_transform);
+		object_transform = stack.pop();
+
+	})(this);
+	this.init_buffers();
+}
+inherit(cup, shape);
+
+
+
 // Pentahedron (Strawberry Base)
 function pentahedron() {
 	shape.call(this); 
@@ -411,18 +457,19 @@ pentahedron.prototype.populate = function() {
 	this.vertices.push( vec3(-.5,1,.5), vec3(-.5,1,-.5), vec3(.5,1,.5) ); 
 	this.vertices.push( vec3(-.5,1,-.5), vec3(.5,1,-.5), vec3(.5,1,.5) );
 
-	// Each face in method 2 also gets its own set of texture coords (half the image is mapped onto each face). Couldn't do 
-	// this with shared vertices since it involves different results when approaching the same point from different directions.
-	this.texture_coords.push( vec3(0,0,0), vec3(-.5,1,.5), vec3(.5,1,.5) ); // Front
-	this.texture_coords.push( vec3(0,0,0), vec3(-.5,1,.5), vec3(-.5,1,-.5) ); // Left
-	this.texture_coords.push( vec3(0,0,0), vec3(.5,1,-.5), vec3(.5,1,.5) ); // Right
-	this.texture_coords.push( vec3(0,0,0), vec3(-.5,1,-.5), vec3(.5,1,-.5) ); // Back
+	// Textures
+
+	// Face
+	this.texture_coords.push( vec2(1,.5), vec2(0,0), vec2(1,1) ); // Front
+	this.texture_coords.push( vec2(0,.5), vec2(0,0), vec2(1,1) ); // Left
+	this.texture_coords.push( vec2(0,.5), vec2(0,0), vec2(1,1) ); // Right
+	this.texture_coords.push( vec2(0,.5), vec2(0,0), vec2(1,1) ); // Back
 
 	// Top
 	this.texture_coords.push( vec3(-.5,1,.5), vec3(-.5,1,-.5), vec3(.5,1,.5) ); 
 	this.texture_coords.push( vec3(-.5,1,-.5), vec3(.5,1,-.5), vec3(.5,1,.5) );
 
-	this.indices.push( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17); // Unique vertices
+	this.indices.push( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
 };
 
 // Flat pentahedron (Strawberry leaf)
@@ -459,5 +506,31 @@ flat_pentahedron.prototype.populate = function() {
 	this.texture_coords.push( vec3(-.5,1,-.5), vec3(.5,1,-.5), vec3(.5,1,.5) );
 
 	this.indices.push( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17); // Unique vertices
+};
+
+// Triangle:
+function triangle(points_transform)
+{
+	shape.call(this);
+	if(!arguments.length) return;
+	this.populate(this,points_transform);
+	this.init_buffers();
+}
+inherit(triangle,shape);
+triangle.prototype.populate = function(recipient, points_transform)
+{
+	var offset = recipient.vertices.length;
+	var index_offset = recipient.indices.length;
+
+	recipient.vertices = [vec3(0,0,0), vec3(0,1,0), vec3(1,0,0)];
+	recipient.normals = [vec3(0,0,1), vec3(0,0,1), vec3(0,0,1)];
+	recipient.texture_coords = [vec2(0,0), vec2(0,1), vec2(1,0)]; 
+	recipient.indices = [0,1,2];
+
+	for(var i = index_offset; i < recipient.indices.length; i++)
+		recipient.indices[i] += offset;
+	for(var i = offset; i < recipient.vertices.length; i++) 
+		recipient.vertices[i] = vec3(mult_vec(points_transform, vec4(recipient.vertices[i],1)));
+
 };
 

@@ -133,11 +133,12 @@ function shape()
 				   
 				var N_LIGHTS = 1, lightPositions = [], lightColors = [], attenuations = [], 
                 lightPositions_flattened = [], lightColors_flattened = [];
-				lightPositions.push( vec4( 10 * Math.sin(graphicsState.animation_time/1000), 2, -2, 1 ) );    
+				// lightPositions.push( vec4( 10 * Math.sin(graphicsState.animation_time/1000), 2, -2, 1 ) );
+				lightPositions.push( vec4(0, 12, 1, 1 ) );    
 				lightColors.push( vec4( 0, 1, 0, 1 ) );   
 				attenuations.push( .0001 );
 
-				lightPositions.push( vec4( 2, 10 * Math.sin(graphicsState.animation_time/1000), -2, 1 ) );    
+				// lightPositions.push( vec4( 2, 10 * Math.sin(graphicsState.animation_time/1000), -2, 1 ) );    
 				lightColors.push( vec4( 1, 0, 0, 1 ) );   
 				attenuations.push( .0001 );
 

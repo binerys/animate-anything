@@ -17,11 +17,15 @@ function CURRENT_BASIS_IS_WORTH_SHOWING(self, model_transform) {
 // 	M A T E R I A L S
 // *******************************************************
 // 1st parameter:  Color (4 floats in RGBA format), 2nd: Ambient light, 3rd: Diffuse reflectivity, 4th: Specular reflectivity, 5th: Smoothness exponent, 6th: Texture image.
-var texture_filenames_to_load = [ "stars.png", "text.png", "earth.gif", "grass.jpg", "strawberry.jpg"];
+var texture_filenames_to_load = [ "stars.png", "text.png", "earth.gif", "grass.jpg", "strawberry.jpg", "wall.jpg", "floor.jpg", "wood-01.jpg", "wood-02.jpg"];
 var purplePlastic = new Material( vec4( .9,.5,.9,1 ), .2, .5, .8, 40 ), // Omit the final (string) parameter if you want no texture
 greyPlastic = new Material( vec4( .5,.5,.5,1 ), .2, .8, .5, 20 ),
 grass = new Material( vec4( .5,.5,.5,1 ), .5, 1, 1, 40, "grass.jpg" ),
-strawberry = new Material( vec4( .91,.012,.106,1 ), .6, 1, 1, 40),
+wall = new Material( vec4( .5,.5,.5,1 ), .5, 1, 1, 40, "wall.jpg" ),
+floor = new Material( vec4( .5,.5,.5,1 ), .5, 1, 1, 40, "floor.jpg" ),
+wood1 = new Material( vec4( .5,.5,.5,1 ), .5, 1, 1, 40, "wood-01.jpg" ),
+wood2 = new Material( vec4( .5,.5,.5,1 ), .5, 1, 1, 40, "wood-02.jpg" ),
+strawberry = new Material( vec4( .91,.012,.106,1 ), .6, 1, 1, 40, "strawberry.jpg"),
 earth = new Material( vec4( .5,.5,.5,1 ), .5, 1, .5, 40, "earth.gif" ),
 stars = new Material( vec4( .5,.5,.5,1 ), .5, 1, 1, 40, "stars.png" );
 
@@ -57,6 +61,8 @@ function Animation()
 		self.m_cylinder = new cylindrical_strip( 10, mat4() );
 		self.m_pentahedron = new pentahedron();
 		self.m_flat_pentahedron = new flat_pentahedron();
+		self.m_cup = new cup();
+		self.m_triangle = new triangle(mat4());
 		// 1st parameter is camera matrix.  2nd parameter is the projection:  The matrix that determines how depth is treated.  It projects 3D points onto a plane.
 		self.graphicsState = new GraphicsState( translation(0, 0,-20), perspective(45, canvas.width/canvas.height, .1, 1000), 0 );
 
@@ -134,43 +140,77 @@ Animation.prototype.display = function(time)
 	/**********************************
 	Start coding here!!!!
 	**********************************/
-	
-	/**********************************
-	STATIC GROUND
-	**********************************/		
-	
 	var stack = [];
 	stack.push(model_transform); 
-	model_transform = this.draw_ground(model_transform);
+		
+	this.draw_ground(model_transform);
+	this.draw_walls(model_transform);
+	this.draw_table(model_transform);
+
+
+	model_transform = mult(model_transform, translation(0,1.4,0));
+	stack.push(model_transform); // STORE AT CENTER OF TEAPOT
+	model_transform = mult(model_transform, scale(.014,.014,.014));
+	this.m_obj.draw(this.graphicsState,model_transform,purplePlastic);
+
+	model_transform = stack.pop(); // MODEL TRANSFORM AT CENTER OF TEAPOT
+	
+
+	for(var i = 0; i<=1; i++)
+	{
+		stack.push(model_transform);
+		stack.push(model_transform); // CENTER
+			model_transform = mult(model_transform, translation((i ? -1 : 1)*.3,0,.67));
+			model_transform = mult(model_transform, scale(.1,.1,.1));
+			this.m_sphere.draw(this.graphicsState, model_transform, floor);
+			model_transform = mult(model_transform, translation(0,0,.7));
+			model_transform = mult(model_transform, scale(.5,.5,.5));
+			this.m_sphere.draw(this.graphicsState, model_transform, greyPlastic);
+		model_transform = stack.pop(); // RETURN TO CENTER	
+
+			model_transform = mult(model_transform, translation((i ? -1 : 1)*.3,-.72,0));
+			model_transform = mult(model_transform, scale(.07,.7,.07));
+			model_transform = mult(model_transform, rotation(90,1,0,0));
+				this.m_cylinder.draw(this.graphicsState, model_transform, greyPlastic);
+			model_transform = mult(model_transform, rotation(-90,1,0,0));
+			model_transform = mult(model_transform, scale(1/.07,1/.7,1/.07));
+			
+			model_transform = mult(model_transform, translation(0,-.35,.1));
+			model_transform = mult(model_transform, scale(.15,.1,.3));
+			this.m_sphere.draw(this.graphicsState, model_transform, stars);
+		model_transform = stack.pop();
+	}
+
+	stack.push(model_transform);
+	model_transform = mult(model_transform, translation(0,-0.25,.78));
+	model_transform = mult(model_transform, rotation(45,0,0,1));
+	model_transform = mult(model_transform, scale(.15,.15,.15));
+	this.m_triangle.draw(this.graphicsState,model_transform,greyPlastic);
 	model_transform = stack.pop();
-	stack.push(model_transform); 
-	//model_transform = mult(model_transform, scale(3,3,3));
-	this.m_pentahedron.draw(this.graphicsState,model_transform, strawberry);
-	model_transform = mult( model_transform, translation( 0, .01, 0 ) );	
-	this.m_flat_pentahedron.draw(this.graphicsState,model_transform, new Material( vec4( .643,1,.263,1 ), .2, 1, 1, 40) );
-	model_transform = stack.pop();
-	//CURRENT_BASIS_IS_WORTH_SHOWING(this, model_transform);							// How to draw a set of axes, conditionally displayed - cycle through by pressing p and m
-	/*
-	model_transform = mult( model_transform, translation( 0, -2, 0 ) );		
-	this.m_fan.draw( this.graphicsState, model_transform, greyPlastic );			// Cone
-	CURRENT_BASIS_IS_WORTH_SHOWING(this, model_transform);
-	
-	model_transform = mult( model_transform, translation( 0, -4, 0 ) );
-	this.m_cylinder.draw( this.graphicsState, model_transform, greyPlastic );		// Tube
-	CURRENT_BASIS_IS_WORTH_SHOWING(this, model_transform);
-	
-	
-	model_transform = mult( model_transform, translation( 0, -3, 0 ) );											// Example Translate
-	model_transform = mult( model_transform, rotation( this.graphicsState.animation_time/20, 0, 1, 0 ) );			// Example Rotate. 1st parameter is scalar for angle, last three are axis of rotation.
-	model_transform = mult( model_transform, scale( 5, 1, 5 ) );												// Example Scale
-	this.m_sphere.draw( this.graphicsState, model_transform, earth );				// Sphere
-	
-	model_transform = mult( model_transform, translation( 0, -2, 0 ) );
-	this.m_strip.draw( this.graphicsState, model_transform, stars );				// Rectangle
-	CURRENT_BASIS_IS_WORTH_SHOWING(this, model_transform);
-	*/
+
+
+	//CURRENT_BASIS_IS_WORTH_SHOWING(this,model_transform);
 }	
 
+Animation.prototype.draw_table = function (model_transform) {
+	var center = model_transform;
+
+	model_transform = mult(model_transform, scale(12,.5,6));
+	this.m_cube.draw(this.graphicsState,model_transform,wood2);
+
+	model_transform = center; 
+	
+	for(var j = 0; j <= 1; j++)
+	{
+		for(var i = 0; i <= 1; i++)
+		{
+			model_transform = mult( model_transform, translation( (i ? -1 : 1)*5.5, -2.5, (j ? -1: 1)*2.5 ) );
+			model_transform = mult(model_transform, scale(1,5,.5));
+				this.m_cube.draw(this.graphicsState,model_transform,wood1);
+			model_transform = center; 
+		}
+	}
+}
 
 Animation.prototype.draw_ground = function( model_transform )
 {
@@ -178,8 +218,36 @@ Animation.prototype.draw_ground = function( model_transform )
 	model_transform = mult( model_transform, scale( GRND_SIZE, GRND_SIZE, GRND_SIZE) ); // Expand the ground
 	model_transform = mult( model_transform, rotation(90, 0, 0, 1) ); // Rotate along z-axis
 	this.m_strip.draw( this.graphicsState, model_transform, grass);				// Rectangle
+}
 
-	return model_transform;
+Animation.prototype.draw_walls = function(model_transform)
+{
+	var center = model_transform;
+	// SIDE WALLS
+	for(var i = -1; i <= 1; i++)
+	{
+		if(i == 0)
+			continue;
+		model_transform = mult(model_transform, translation(i*10,5,0));
+		model_transform = mult(model_transform, scale(10,20,15));
+			this.m_strip.draw(this.graphicsState, model_transform, wall);	
+		model_transform = center; 
+	}
+	// FLOOR/CEILING
+	for(i = 0; i <= 1; i++)
+	{
+		model_transform = mult(model_transform, translation(0,(i ? -4.9 : 15),0));
+		model_transform = mult(model_transform, scale(20,20,15));
+		model_transform = mult(model_transform, rotation(90,0,0,1));
+			this.m_strip.draw(this.graphicsState, model_transform, (i ? floor : new Material(vec4(.961,.914,.863,1),.2, 1, 1, 40)));
+		model_transform = center;
+	}
+	
+	// BACK WALL
+	model_transform = mult(model_transform, translation(0,11,-7.5));
+	model_transform = mult(model_transform, scale(20,8,15));
+	model_transform = mult(model_transform, rotation(90,0,1,0));
+		this.m_strip.draw(this.graphicsState, model_transform, wall);
 }
 
 Animation.prototype.update_strings = function( debug_screen_strings )		// Strings this particular class contributes to the UI
