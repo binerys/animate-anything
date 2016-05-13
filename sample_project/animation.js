@@ -17,7 +17,7 @@ function CURRENT_BASIS_IS_WORTH_SHOWING(self, model_transform) {
 // 	M A T E R I A L S
 // *******************************************************
 // 1st parameter:  Color (4 floats in RGBA format), 2nd: Ambient light, 3rd: Diffuse reflectivity, 4th: Specular reflectivity, 5th: Smoothness exponent, 6th: Texture image.
-var texture_filenames_to_load = [ "assets/stars.png", "assets/text.png", "assets/text2.png", "earth.gif", "assets/grass.jpg", "assets/strawberry.jpg", "assets/wall.jpg", "assets/floor.jpg", "assets/wood-01.jpg", "assets/wood-02.jpg", "assets/glass.jpg", "assets/smoke.png"];
+var texture_filenames_to_load = [ "assets/stars.png", "assets/text.png", "assets/text2.png", "earth.gif", "assets/grass.jpg", "assets/strawberry.jpg", "assets/wall.jpg", "assets/floor.jpg", "assets/wood-01.jpg", "assets/wood-02.jpg", "assets/glass.jpg", "assets/smoke.png", "assets/title.png"];
 var purplePlastic = new Material( vec4( .9,.5,.9,1 ), .2, .5, .8, 40 ), // Omit the final (string) parameter if you want no texture
 greyPlastic = new Material( vec4( .5,.5,.5,1 ), .2, .8, .5, 20 ),
 grass = new Material( vec4( .5,.5,.5,1 ), .5, 1, 1, 40, "assets/grass.jpg" ),
@@ -28,6 +28,7 @@ wood2 = new Material( vec4( .5,.5,.5,1 ), .5, 1, 1, 40, "assets/wood-02.jpg" ),
 clear_glass = new Material( vec4( .69,.878,.902,.5 ), .2, .8, .5, 20 ),
 glass = new Material( vec4( .5,.5,.5,1 ), .5, 1, 1, 40, "assets/glass.jpg" ),
 smoke = new Material( vec4( 1,1,1,1 ), .5, 1, 1, 40, "assets/smoke.png" ),
+title = new Material( vec4( 0,0,0,1 ), 1, 1, 1, 40, "assets/title.png" ),
 strawberry = new Material( vec4( .91,.012,.106,1 ), .5, 1, .5, 40, "assets/strawberry.jpg"),
 strawberry_flat = new Material( vec4( .91,.012,.106,1 ), .6, 1, 1, 40),
 strawberry_leaves = new Material( vec4( .337,.51,.012,1 ), .6, 1, 1, 40),
@@ -37,17 +38,21 @@ earth = new Material( vec4( .5,.5,.5,1 ), .5, 1, .5, 40, "assets/earth.gif" ),
 stars = new Material( vec4( .5,.5,.5,1 ), .5, 1, 1, 40, "assets/stars.png" );
 
 // *******************************************************
-// 	C O N S T A N T S & A U D I O
+// 	M I S C. 
 // *******************************************************
-var GRND_SIZE = 160;
-var x= new Array(); 
-var y= new Array(); 
-var z= new Array();
+var GRND_SIZE = 100;
+
+// Smoke positions
+var x = new Array(); 
+var y = new Array(); 
+var z = new Array();
+
 for(var i=0; i<100; i++){
 	x[i]=.5-Math.random(); 
 	y[i]=Math.abs(.5-Math.random()); 
 	z[i]=-1*Math.abs(.5-Math.random());
 }
+
 var song = new Audio("./assets/teapot_song.mp3");
 
 
@@ -82,7 +87,7 @@ function Animation()
 		self.m_triangle = new triangle(mat4());
 		self.m_text = new text_line( 30); 
 		// 1st parameter is camera matrix.  2nd parameter is the projection:  The matrix that determines how depth is treated.  It projects 3D points onto a plane.
-		self.graphicsState = new GraphicsState( translation(0, 0,-20), perspective(45, canvas.width/canvas.height, .1, 1000), 0);
+		self.graphicsState = new GraphicsState( translation(0, -1.5,-8), perspective(45, canvas.width/canvas.height, .1, 1000), 0);
 
 		gl.uniform1i( g_addrs.GOURAUD_loc, gouraud);		gl.uniform1i( g_addrs.COLOR_NORMALS_loc, color_normals);		gl.uniform1i( g_addrs.SOLID_loc, solid);
 		
@@ -166,12 +171,34 @@ Animation.prototype.display = function(time)
 	this.draw_table(model_transform);
 	
 
-	// Draw teapot - from here on, everything is in reference to the teapot
+	// Initial position for teapot - reference point for all objects on table
 	model_transform = mult(model_transform, translation(0,1.4,0)); // Position teapot
 	stack.push(model_transform); 
 	this.draw_berry_bowl(model_transform);
 
+	if(!animate)
+	{
+		this.draw_teapot(model_transform, false, false);
+		stack.push(model_transform);
+			model_transform = mult(model_transform, translation(-2,-.9,-2.5)); // Position teacup
+			this.draw_cup(model_transform);
+		model_transform = stack.pop();
 
+		stack.push(model_transform);
+			model_transform = mult(model_transform, translation(0,1.5,1)); // Position title
+			model_transform = mult(model_transform, rotation(90,0,1,0)); // Position title
+			model_transform = mult(model_transform, rotation(5*Math.sin(time/500),1,0,0)); // Position title
+			model_transform = mult(model_transform, scale(5,5,5))
+			this.m_strip.draw(this.graphicsState, model_transform, title);
+		model_transform = stack.pop();
+
+		stack.push(model_transform);
+			model_transform = mult(model_transform, translation(-2.55,-1.07,2.4));
+			model_transform = mult(model_transform, scale(.3,.3,.3));
+			this.draw_text(model_transform,"Press ALT+A To Start");
+		model_transform = stack.pop();
+
+	}
 
 	if(animate)
 	{

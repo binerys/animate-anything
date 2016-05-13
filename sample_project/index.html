@@ -116,6 +116,7 @@ void main()
 		gl_FragColor.xyz += attenuation * (color.xyz * diffusivity * diffuse  + lightColor[i].xyz * shininess * specular );
 	}
 	gl_FragColor.a = gl_FragColor.w;
+
 }
 </script>
 
@@ -136,16 +137,5 @@ Javascript "include" files.  Any code in them gets executed as part of the page 
 <script type="text/javascript" src="animation.js"></script>
 
 </head><body>
-<canvas id="gl-canvas" width="940" height="560"></canvas><p>
-Controlling this Graphics Canvas: 
-<ul><li>Animation is paused when this program starts, so first you should press ALT+a to play or pause animation. <li>
-		Fly around the scene to adjust your vantage point using the keys w a s d to move in the plane that's along the ground, 
-		and the keys space and z to float up and down.  At any time press r to reset the camera and vantage point back to the origin. <li>
-		The f key unfreezes the camera's rotation setting so you can aim it around while flying or sitting still.  Move the mouse around away from the 
-		center of the window to steer, and press f again to stop this and to freeze the steering again.  Any roll rotation is controlled
-		separately with the comma and period keys. <li>The keys ALT+n, ALT+g, and ALT+s switch shading behaviors.  ALT+n directly shows you normal vectors on shapes 
-		by interpreting X,Y,Z vectors as R,G,B colors.  ALT+g toggles Gouraud shading vs Smooth Phong shading with textures, and ALT+s colors everything a random solid color. <li>
-		Press 1 and 2 to cycle through a live feed of important strings and values of the program -- each Displayable object has a function where it can provide these. <li>
-		The keys p and m cycle through a list of the coordinate axes (bases) you have listed down as worth drawing (at various points within your drawing routine). <li>
-		Have fun.
+<canvas id="gl-canvas" width="938" height="560"></canvas><p>
 </p></body></html>
