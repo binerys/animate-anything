@@ -180,7 +180,7 @@ inherit(cube, shape);
 	}
 	
 
-function sphere( points_transform, max_subdivisions )		// Build a complicated sphere using subdivision, starting with a simple tetrahedron.  
+function sphere( points_transform, max_subdivisions, half )		// Build a complicated sphere using subdivision, starting with a simple tetrahedron.  
 	{	
 		shape.call(this);	
 									// From the starting tetrahedron all the way down to the final sphere, we'll store each level-of-detail sphere in separate index lists, so can also draw coarser spheres later.
@@ -215,7 +215,7 @@ function sphere( points_transform, max_subdivisions )		// Build a complicated sp
 		for( var i = 1; i <= max_subdivisions; i++ )		// Empty index lists for each level-of-detail 
 			this.indices_LOD[i] = [];
 		
-		this.populate( this, points_transform, max_subdivisions );
+		this.populate( this, points_transform, max_subdivisions, half );
 		
 		for( var i = 1; i <= max_subdivisions; i++ )		// Each index list of every detail-level gets its own index buffer in the graphics card
 		{
@@ -262,7 +262,7 @@ function sphere( points_transform, max_subdivisions )		// Build a complicated sp
 	}
 inherit(sphere, shape);
 
-	sphere.prototype.populate = function ( recipient, points_transform, max_subdivisions ) 
+	sphere.prototype.populate = function ( recipient, points_transform, max_subdivisions, half ) 
 		{	
 			var offset = recipient.vertices.length;									// Starting tetrahedron
 			recipient.vertices.push(		vec3(0.0, 0.0, -1.0) 				 );
@@ -271,7 +271,8 @@ inherit(sphere, shape);
 			recipient.vertices.push(		vec3(0.816497, -0.471405, 0.333333)  );
 			
 			this.subdivideTriangle( 0 + offset, 1 + offset, 2 + offset, recipient, max_subdivisions);	// Begin recursion
-			this.subdivideTriangle( 3 + offset, 2 + offset, 1 + offset, recipient, max_subdivisions);
+			if (half == 0)
+				this.subdivideTriangle( 3 + offset, 2 + offset, 1 + offset, recipient, max_subdivisions);
 			this.subdivideTriangle( 1 + offset, 0 + offset, 3 + offset, recipient, max_subdivisions);
 			this.subdivideTriangle( 0 + offset, 2 + offset, 3 + offset, recipient, max_subdivisions); 
 			
@@ -352,7 +353,7 @@ function text_line( string_size )		// Draws a rectangle textured with images of 
 				for( var i = 0; i < max_size; i++ )
 				{
 					rectangular_strip.prototype.populate( self, 1, object_transform );
-					object_transform = mult( object_transform, translation( 0, 0, -.7 ));
+					object_transform = mult( object_transform, translation( 0, 0, -.9 ));
 				}
 			} )( this, string_size );
 			
@@ -361,7 +362,7 @@ function text_line( string_size )		// Draws a rectangle textured with images of 
 		this.draw = function( graphicsState, model_transform, heads_up_display, color ) 
 			{
 				if( heads_up_display )			{	gl.disable( gl.DEPTH_TEST );	var temp_camera_transform = graphicsState.camera_transform;	graphicsState.camera_transform = mat4();	}
-				shape.prototype.draw.call(this, graphicsState, model_transform, new Material( color, 1, 0, 0, 40, "text.png" ) );	
+				shape.prototype.draw.call(this, graphicsState, model_transform, new Material( color, 1, 0, 0, 40, "assets/text2.png" ) );	
 				if( heads_up_display )			{	gl.enable(  gl.DEPTH_TEST );		graphicsState.camera_transform = temp_camera_transform;	}
 			}
 			
@@ -395,17 +396,17 @@ function cup()
 	this.populate = (function (self)
 	{
 		var stack = [];
-		self.m_ball = new sphere(); self.m_fan = new cylindrical_strip(); self.m_cube = new cube();
+		self.m_ball = new sphere( mat4(),4,0); self.m_fan = new cylindrical_strip(); self.m_cube = new cube();
 		var object_transform = mat4();
 		stack.push(object_transform);
 			object_transform = mult(object_transform, scale(0.30,0.2,0.30));
-			self.m_ball.populate( self, object_transform, 4);
+			self.m_ball.populate( self, object_transform, 4, 0);
 		object_transform = stack.pop();
 		stack.push(object_transform);
 		
 		object_transform = mult(object_transform, translation(0,.15,0));
 		object_transform = mult(object_transform, rotation(90,1,0,0));
-		object_transform = mult(object_transform, scale(0.313,0.313,0.313));
+		object_transform = mult(object_transform, scale(0.314,0.314,0.314));
 			self.m_fan.populate(self, 10, object_transform);
 		object_transform = stack.pop();
 

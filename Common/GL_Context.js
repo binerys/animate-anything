@@ -104,15 +104,15 @@ function Debug_Screen()
 		} 
 		
 		model_transform     = mult( model_transform, translation( 0, 20, -32 ) );
-		this.m_text.set_string( "Controls:" );
-		this.m_text.draw( this.graphicsState, model_transform, true, vec4(0,0,0,1) );		// Comment this out to not display any strings on the UI
+		//this.m_text.set_string( "Controls:" );
+		//this.m_text.draw( this.graphicsState, model_transform, true, vec4(0,0,0,1) );		// Comment this out to not display any strings on the UI
 		
 		var key_combinations = Object.keys( shortcut.all_shortcuts );
 		for( var i = 0; i < key_combinations.length; i++ )
 		{
 			model_transform = mult( model_transform, translation( 0, -1, 0 ) );				
 			this.m_text.set_string( key_combinations[i] );
-			this.m_text.draw( this.graphicsState, model_transform, true, vec4(0,0,0,1) );		// Comment this out to not display any controls on the UI
+			//this.m_text.draw( this.graphicsState, model_transform, true, vec4(0,0,0,1) );		// Comment this out to not display any controls on the UI
 		}
 	}
 
@@ -125,7 +125,7 @@ function Debug_Screen()
 
 	Debug_Screen.prototype.update_strings = function( debug_screen_object ) 			// Strings this particular class contributes to the UI
 	{
-		debug_screen_object.string_map["tick"] = "Frame: " + this.tick++;
-		debug_screen_object.string_map["start_index"] = "start_index: " + this.start_index;
+		//debug_screen_object.string_map["tick"] = "Frame: " + this.tick++;
+		//debug_screen_object.string_map["start_index"] = "start_index: " + this.start_index;
 	}
 

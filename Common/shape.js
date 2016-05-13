@@ -95,7 +95,7 @@ function shape()
 		};
 	
 	shape.prototype.spherical_texture_coords = function( vert_index )
-		{	this.texture_coords.push( vec2( .5 + Math.atan2( this.vertices[vert_index][2], this.vertices[vert_index][0] ) / 2 / Math.PI, .5 - 2 * Math.asin( this.vertices[vert_index][1] ) / 2 / Math.PI ) );
+		{	this.texture_coords.push( vec2( .5 + Math.atan2( this.vertices[vert_index][2], this.vertices[vert_index][0] ) / 2 / Math.PI, .5 - 2 * Math.asin( this.vertices[vert_index][1] ) / 2/ Math.PI ) );
 		}
 	
 	shape.prototype.init_buffers = function()			// Send the completed vertex and index lists to their own buffers in the graphics card.
@@ -134,13 +134,13 @@ function shape()
 				var N_LIGHTS = 1, lightPositions = [], lightColors = [], attenuations = [], 
                 lightPositions_flattened = [], lightColors_flattened = [];
 				// lightPositions.push( vec4( 10 * Math.sin(graphicsState.animation_time/1000), 2, -2, 1 ) );
-				lightPositions.push( vec4(0, 12, 1, 1 ) );    
-				lightColors.push( vec4( 0, 1, 0, 1 ) );   
+				lightPositions.push( vec4(-5, 10, 3, 1 ) );    
+				lightColors.push( vec4( 0, 0, 0, 1 ) );   
 				attenuations.push( .0001 );
 
 				// lightPositions.push( vec4( 2, 10 * Math.sin(graphicsState.animation_time/1000), -2, 1 ) );    
-				lightColors.push( vec4( 1, 0, 0, 1 ) );   
-				attenuations.push( .0001 );
+				//lightColors.push( vec4( 0, 0, 0, 1 ) );   
+				//attenuations.push( .0001 );
 
 				for( var i = 0; i < 4 * N_LIGHTS; i++ )
 				{
